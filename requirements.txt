@@ -3,3 +3,4 @@ requests
 eth-account
 web3
 python-dotenv
+web3-proxy-providers

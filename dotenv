@@ -6,4 +6,3 @@ RECVR_ACC_PVT_KEY='0x3509aac77873c69d280fda993ad06abdfa0243f4b36eb394a858961bbfd
 # RPC_URL='https://sepolia.infura.io/v3/4e0625c5f11f4c7b97100b9c95984e13'
 RPC_URL='https://http.gaming.5ire.network'
 AIRDROP_AMT='10'
-SEND_AMT='0.0000000001'

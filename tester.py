@@ -142,7 +142,7 @@ def parseProxies1(proxies):
         p['ip'] = proxi['ip']
         p['port'] = proxi['port']
         p['proto'] = proxi['protocol']
-        p['hash'] = hashlib.sha256(f'{ p['ip']}{ p['port']}{ p['proto']}'.encode('utf-8')).hexdigest()
+        p['hash'] = hashlib.sha256(f"{ p['ip']}{ p['port']}{ p['proto']}".encode('utf-8')).hexdigest()
         proxiList.append(p)
 
 def parseProxies2(proxies):
@@ -152,7 +152,7 @@ def parseProxies2(proxies):
             p['ip'] = proxi['ip']
             p['port'] = proxi['port']
             p['proto'] = proto
-            p['hash'] = hashlib.sha256(f'{ p['ip']}{ p['port']}{ p['proto']}'.encode('utf-8')).hexdigest()
+            p['hash'] = hashlib.sha256(f"{ p['ip']}{ p['port']}{ p['proto']}".encode('utf-8')).hexdigest()
             proxiList.append(p)
 
 def handleFailedProxy(proxy):

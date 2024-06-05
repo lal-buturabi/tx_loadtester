@@ -165,7 +165,10 @@ def releaseProxy(proxy):
 
 def getRandomUsedProxy():
     phash = random.choice(usedProxies)
-    return [p for p in proxiList if p['hash'] == phash][0]
+    q = [p for p in proxiList if p['hash'] == phash]
+    if len(q) == 0:
+        return {}
+    return q[0]
 def getNextProxy():
     proxy = {}
     for proxi in proxiList:
@@ -217,10 +220,13 @@ def createTxn(sendAddr):
     return txn
 
 def transferCoins(sender):
+    web3p = None
+    sess = None
     bal = web3.eth.get_balance(sender.address)
     mini = web3.to_wei(SEND_AMT, 'ether')
     proxy = getNextProxy()
-    sess = getProxySession(proxy)
+    if proxy != {}:
+        sess = getProxySession(proxy)
     while bal > mini:
         txn = createTxn(sender.address)
         signedTxn = web3.eth.account.sign_transaction(txn, sender.key)
@@ -228,7 +234,10 @@ def transferCoins(sender):
             # web3 with proxy
             # web3p = Web3(provider=getProvider(sess[1]))
             # print(f'Using proxi: {sess[1]} for {sender.address}')
-            web3p = Web3(Web3.HTTPProvider(RPC_URL, request_kwargs={'proxies': {'http': sess[1], 'https': sess[1]}}, session=sess[0]))
+            if proxy == {}:
+                web3p = Web3(Web3.HTTPProvider(RPC_URL))
+            else:     
+                web3p = Web3(Web3.HTTPProvider(RPC_URL, request_kwargs={'proxies': {'http': sess[1], 'https': sess[1]}}, session=sess[0]))
             
             txHash = web3p.eth.send_raw_transaction(signedTxn.rawTransaction)
             print(f'sending from {sender.address} ..')
@@ -254,6 +263,7 @@ def transferFromEachWallet():
         thread = threading.Thread(target=transferCoins, args=(signer,))
         thread.start()
         threads.append(thread)
+    print(f'Started {len(threads)} Threads')
     for thread in threads:
         thread.join()
 

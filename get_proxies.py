@@ -27,7 +27,7 @@ def test_proxy(proxy):
 
 def main():
     proxies_json_url = "https://proxylist.geonode.com/api/proxy-list?limit=500&page=1&sort_by=lastChecked&sort_type=desc"  # Replace with the actual URL
-    proxies_json_url = "https://proxylist.geonode.com/api/proxy-list?protocols=http&speed=medium&limit=500&page=1&sort_by=lastChecked&sort_type=desc"
+    # proxies_json_url = "https://proxylist.geonode.com/api/proxy-list?protocols=http&speed=medium&limit=500&page=1&sort_by=lastChecked&sort_type=desc"
     proxies = fetch_proxies(proxies_json_url)['data']
     # print(proxies) 
     # for p in proxies:

@@ -1,9 +1,10 @@
 import json
+import asyncio
 import threading
 import hashlib
 import time
 import requests.adapters
-from web3 import Web3
+from web3 import Web3, AsyncWeb3, AsyncHTTPProvider
 from web3.exceptions import TimeExhausted
 from eth_account import Account
 
@@ -617,65 +618,74 @@ def loadProxiesFromJsonFile(file_path):
         proxies = json.load(f)
     return proxies
 
-def createTxn(w):
+def createTxn(v):
     txn = {
         'to': RECVR_ACC,
-        'value': w.to_wei(SEND_AMT, 'ether'),
+        'value': v,
         'gas': 21000,
         'gasPrice': '',
         'nonce': 0,
     }
     return txn
 
-def transferCoins(sender, rpc, t):
-    time.sleep(0.1)
-    try:
-        web3p = Web3(Web3.HTTPProvider(rpc))
-        bal = web3p.eth.get_balance(sender.address)
-        # print(bal)
-        mini = web3p.to_wei(SEND_AMT, 'ether')
-        # proxy = getNextProxy()
-        # if proxy != {}:
-        #     sess = getProxySession(proxy)
-        txn = createTxn(web3p)
-    except:
-        return
+async def transferCoins(sender, rpc, t):
+    while True:
+        await asyncio.sleep(0.1)
+        try:
+            # print(f'sender: {sender.address} rpc: {rpc}')
+            web3p = AsyncWeb3(AsyncHTTPProvider(rpc))
+            bal = await web3p.eth.get_balance(sender.address)
+            mini = web3p.to_wei(SEND_AMT, 'ether')
+            # proxy = getNextProxy()
+            # if proxy != {}:     
+            #     sess = getProxySession(proxy)
+            #     web3p = AsyncWeb3(AsyncHTTPProvider(rpc, request_kwargs={'proxies': {'http': sess[1], 'https': sess[1]}}))
+            v = web3p.to_wei(SEND_AMT, 'ether')
+            txn = createTxn(v)
+            # print(f'RPC connection established. {rpc}')
+            break
+        except Exception as e:
+            # print('Execption: ', e)
+            continue
     # i = 4
     while bal > mini:
     # while i > 0:
-        time.sleep(0.1)
-        txn['gasPrice'] = web3p.eth.gas_price
-        txn['nonce'] = web3p.eth.get_transaction_count(sender.address)
-        signedTxn = web3p.eth.account.sign_transaction(txn, sender.key)
+        await asyncio.sleep(0.1)
         try:
+            # print(1)
+            txn['gasPrice'] = await web3p.eth.gas_price
+            # print('gp', txn['gasPrice'])
+            txn['nonce'] = await web3p.eth.get_transaction_count(sender.address)
+            # print('nonce', txn['nonce'])
+            signedTxn = web3p.eth.account.sign_transaction(txn, sender.key)
+            # print('signed')
             # web3 with proxy
-            # web3p = Web3(provider=getProvider(sess[1]))
             # print(f'Using proxi: {sess[1]} for {sender.address}')
-            #if proxy == {}:
-       
-            # else:     
-            #     web3p = Web3(Web3.HTTPProvider(rpc, request_kwargs={'proxies': {'http': sess[1], 'https': sess[1]}}, session=sess[0]))
             
-            txHash = web3p.eth.send_raw_transaction(signedTxn.rawTransaction)
-            print(f'sending from {sender.address} thread #: {t} RPC: {rpc} ..')
-            # time.sleep(1)
-            web3p.eth.wait_for_transaction_receipt(txHash)
+            txHash = await web3p.eth.send_raw_transaction(signedTxn.rawTransaction)
+            # print('txhash', txHash)
+            print(f'sending from {sender.address} thread #: {t} RPC: {rpc} txHash: {len(txHash)} ..')
+            # await asyncio.sleep(1)
+            await web3p.eth.wait_for_transaction_receipt(txHash)
             print('finalized.')
-            # time.sleep(1)
+            # await asyncio.sleep(1)
         except (RequestException, Timeout, ProxyError, ConnectionError) as e:
             # print(f"Proxy failed for {sender.address}. trying with next..")
+            # print('Exception: ', e)
             # proxy = handleFailedProxy(proxy)
             # sess = getProxySession(proxy)
             continue
         except (ValueError, TimeExhausted) as e:
+            # print('Exception: ', e)
             continue
-        except:
+        except Exception as e:
+            # print('Exception: ', e)
             continue
         # i -= 1
     print(f'bal of {sender.address} has reached the minimum')
 
-def transferFromEachWallet():
-    threads = []
+async def transferFromEachWallet():
+    tasks = []
     signers = getSigners()
     signersArr = [
         signers[:100],
@@ -686,24 +696,18 @@ def transferFromEachWallet():
     print(f'signers: 300')
     for i, rpc in enumerate(rpcs):
         print(f'RPC: {i}')
-        try:
-            for signer in signersArr[i]:
-                time.sleep(0.1)
-                thread = threading.Thread(target=transferCoins, args=(signer, rpc, t,))
-                thread.start()
-                threads.append(thread)
-                t += 1
-        except ConnectionError as e:
-            print(f'{rpc} resulted into ConnectionError')
-    print(f'Started {len(threads)} Threads')
-    for thread in threads:
-        thread.join()
+        for signer in signersArr[i]:
+            await asyncio.sleep(0.01)
+            tasks.append(transferCoins(signer, rpc, t,))
+            t += 1
+    print(f'Started {len(tasks)} Tasks')
+    await asyncio.gather(*tasks)
 
-def main():
-    # global web3
-    # web3 = None
-    # web3 = Web3(Web3.HTTPProvider(rpcs[0]))
-    # print(web3.eth.block_number)
+async def main():
+    global web3
+    web3 = None
+    web3 = Web3(Web3.HTTPProvider(rpcs[0]))
+    print(web3.eth.block_number)
     # return
     # proxies1 = loadProxiesFromJsonFile('working_proxies.json')
     # proxies2 = loadProxiesFromJsonFile('working_proxies_new.json')
@@ -711,10 +715,10 @@ def main():
     # parseProxies1(proxies1)
     # parseProxies2(proxies2)
 
-    print(f'total proxies: {len(proxiList)}')
+    # print(f'total proxies: {len(proxiList)}')
     
-    transferFromEachWallet()
+    await transferFromEachWallet()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
 

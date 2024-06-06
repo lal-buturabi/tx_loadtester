@@ -1193,7 +1193,7 @@ async def transferFromEachWallet():
         signers[600:900]
     ]
     t = 0
-    print(f'signers: 300')
+    print(f'signers: 900')
     for i, rpc in enumerate(rpcs):
         print(f'RPC: {i}')
         for signer in signersArr[i]:

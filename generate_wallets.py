@@ -2,6 +2,7 @@ import sys
 from pprint import pprint as pretty
 from eth_account import Account
 from eth_account.hdaccount import generate_mnemonic#, mnemonic_to_private_key
+import pickle
 
 def generate_wallets(num_wallets):
     Account.enable_unaudited_hdwallet_features()
@@ -15,12 +16,14 @@ def generate_wallets(num_wallets):
 
 
 def main():
-    N = 500
+    N = 1800
     if len(sys.argv) > 1:
         N = sys.argv[1]
     
     wallets = [(w.address, w.key.hex()) for w in generate_wallets(N)]
-    pretty(wallets)
+    with open(f'wallets_{N}.pkl', 'wb') as file:
+        pickle.dump(wallets, file)
+    pretty(f'Number of wallets generated and saved: {len(wallets)}')
 
 if __name__ == '__main__':
     main()

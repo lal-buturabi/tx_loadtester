@@ -37,10 +37,10 @@ def airdropCoins(addrListArr):
 
     i = 0
     # resume code
-    while True:
-        if addrListArr[i][0] == '0xb1ebb571231db383B7AC3dc0E8Fd49b48412e58a':
-            break
-        i += 1
+    # while True:
+    #     if addrListArr[i][0] == '0xb1ebb571231db383B7AC3dc0E8Fd49b48412e58a':
+    #         break
+    #     i += 1
     while i < l:
         try:
             addr = addrListArr[i][0]
@@ -60,7 +60,7 @@ def airdropCoins(addrListArr):
     pass
 
 files = [
-    'wallets_2000.pkl'
+    'wallets_4200.pkl'
 ]
 
 def main(): 

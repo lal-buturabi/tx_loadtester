@@ -185,7 +185,7 @@ async def transferCoins(sender, rpc, t):
 async def transferFromEachWallet():
     tasks = []
     wallets = []
-    with open('wallets_4800.pkl', 'rb') as file:
+    with open('wallets_9000.pkl', 'rb') as file:
         wallets = pickle.load(file)
     keys  = [w[1] for w in wallets]
     signers = getSigners(keys)

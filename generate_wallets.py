@@ -16,7 +16,7 @@ def generate_wallets(num_wallets):
 
 
 def main():
-    N = 2000
+    N = 4200
     if len(sys.argv) > 1:
         N = sys.argv[1]
     

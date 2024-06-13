@@ -13,7 +13,7 @@ RPC_URL = os.getenv('RPC_URL')
 MAIN_ACC = os.getenv('MAIN_ACC')
 AIRDROP_AMT = os.getenv('AIRDROP_AMT')
 MAIN_ACC_PVT_KEY = os.getenv('MAIN_ACC_PVT_KEY')
-
+AIRDROP_AMT = 5
 addrList = [
     
 ]
@@ -37,10 +37,10 @@ def airdropCoins(addrListArr):
 
     i = 0
     # resume code
-    # while True:
-    #     if addrListArr[i][0] == '0x086971D902bA94B4083B13cfb1d2281B01f4f58C':
-    #         break
-    #     i += 1
+    while True:
+        if addrListArr[i][0] == '0xb1ebb571231db383B7AC3dc0E8Fd49b48412e58a':
+            break
+        i += 1
     while i < l:
         try:
             addr = addrListArr[i][0]
@@ -60,7 +60,7 @@ def airdropCoins(addrListArr):
     pass
 
 files = [
-    'wallets_1800.pkl'
+    'wallets_2000.pkl'
 ]
 
 def main(): 

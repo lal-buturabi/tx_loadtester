@@ -7,16 +7,13 @@ from eth_account import Account
 from dotenv import load_dotenv
 import pickle
 load_dotenv()
+# well i have changed the code a bit
 
-
-RPC_URL = os.getenv('RPC_URL')
+RPC_URL = os.getenv('RPC_URL1')
 MAIN_ACC = os.getenv('MAIN_ACC')
-AIRDROP_AMT = os.getenv('AIRDROP_AMT')
+AIRDROP_AMT =  '4'
 MAIN_ACC_PVT_KEY = os.getenv('MAIN_ACC_PVT_KEY')
 AIRDROP_AMT = 5
-addrList = [
-    
-]
 
 def createTxn(web3, rcvAddr, i):
     txn = {
@@ -37,10 +34,10 @@ def airdropCoins(addrListArr):
 
     i = 0
     # resume code
-    # while True:
-    #     if addrListArr[i][0] == '0xb1ebb571231db383B7AC3dc0E8Fd49b48412e58a':
-    #         break
-    #     i += 1
+    while True:
+        if addrListArr[i][0] == '0x02CDe1f482486d4b28dcB8DE0d99696916c96729':
+            break
+        i += 1
     while i < l:
         try:
             addr = addrListArr[i][0]
@@ -60,10 +57,11 @@ def airdropCoins(addrListArr):
     pass
 
 files = [
-    'wallets_4200.pkl'
+    'wallets_9000.pkl'
 ]
 
 def main(): 
+    print(f'rpc: {RPC_URL}')
     print(f'Fund amount: {AIRDROP_AMT} STC')
     addrListArr = []
     with open(f'{files[0]}', 'rb') as file:
